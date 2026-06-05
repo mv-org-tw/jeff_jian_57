@@ -1,67 +1,146 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <title>直播聊天室聚合器</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #fff; margin: 0; padding: 20px; }
-        .settings { background: #333; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 10px; }
-        input { padding: 10px; border-radius: 4px; border: none; width: 250px; }
-        button { padding: 10px 20px; cursor: pointer; background: #9147ff; color: #fff; border: none; border-radius: 4px; font-weight: bold; }
-        .chat-container { display: flex; gap: 20px; height: 75vh; }
-        .chat-box { flex: 1; display: flex; flex-direction: column; }
-        iframe { width: 100%; height: 100%; border: 1px solid #444; background: #000; }
-        h3 { margin-top: 0; color: #aaa; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>雙平台聊天室</title>
+
+<style>
+    body {
+        margin: 0;
+        background: #000;
+        font-family: sans-serif;
+        overflow: hidden;
+    }
+
+    /* 上方控制列（只有YT輸入） */
+    .bar {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 999;
+        display: flex;
+        gap: 8px;
+    }
+
+    input {
+        padding: 8px;
+        border: none;
+        border-radius: 6px;
+        width: 220px;
+    }
+
+    button {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        background: #9147ff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .container {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+    }
+
+    .box {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    iframe {
+        flex: 1;
+        border: none;
+        width: 100%;
+    }
+
+    h3 {
+        margin: 0;
+        padding: 6px;
+        font-size: 12px;
+        background: #111;
+        color: #aaa;
+    }
+
+    /* 手機直排 */
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+        }
+    }
+
+    /* 全螢幕按鈕 */
+    .fs {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 999;
+        padding: 8px 12px;
+        background: #9147ff;
+        border: none;
+        color: #fff;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+</style>
 </head>
+
 <body>
 
-    <div class="settings">
-        <input type="text" id="ytId" placeholder="YouTube 影片 ID (例如: 8MeECxZuFfs)">
-        <input type="text" id="twitchName" placeholder="Twitch 頻道名稱 (例如: jeff_jian_57)">
-        <button onclick="saveAndLoad()">載入聊天室</button>
+<!-- 只有YT輸入框 -->
+<div class="bar">
+    <input id="ytId" placeholder="輸入 YouTube 影片 ID">
+    <button onclick="load()">載入</button>
+</div>
+
+<button class="fs" onclick="toggleFS()">全螢幕</button>
+
+<div class="container">
+    <div class="box">
+        <h3>YouTube Chat</h3>
+        <iframe id="yt"></iframe>
     </div>
 
-    <div class="chat-container">
-        <div class="chat-box">
-            <h3>YouTube 聊天室</h3>
-            <iframe id="ytFrame"></iframe>
-        </div>
-        <div class="chat-box">
-            <h3>Twitch 聊天室</h3>
-            <iframe id="twitchFrame"></iframe>
-        </div>
+    <div class="box">
+        <h3>Twitch Chat (jeff_jian_57)</h3>
+        <iframe id="tw"></iframe>
     </div>
+</div>
 
-    <script>
-        // 頁面載入時，自動填入上次的紀錄
-        window.onload = () => {
-            document.getElementById('ytId').value = localStorage.getItem('ytId') || '';
-            document.getElementById('twitchName').value = localStorage.getItem('twitchName') || '';
-            if(document.getElementById('ytId').value || document.getElementById('twitchName').value) {
-                updateChats();
-            }
-        };
+<script>
+const TWITCH_CHANNEL = "jeff_jian_57";
 
-        function saveAndLoad() {
-            // 儲存到瀏覽器記憶體
-            localStorage.setItem('ytId', document.getElementById('ytId').value);
-            localStorage.setItem('twitchName', document.getElementById('twitchName').value);
-            updateChats();
-        }
+window.onload = () => {
+    document.getElementById("ytId").value =
+        localStorage.getItem("ytId") || "";
+};
 
-        function updateChats() {
-            const ytId = document.getElementById('ytId').value;
-            const twitchName = document.getElementById('twitchName').value;
-            const parent = window.location.hostname || "127.0.0.1";
+function load() {
+    const ytId = document.getElementById("ytId").value;
+    const parent = window.location.hostname || "127.0.0.1";
 
-            if (ytId) {
-                document.getElementById('ytFrame').src = `https://www.youtube.com/live_chat?v=${ytId}&embed_domain=${parent}`;
-            }
-            if (twitchName) {
-                document.getElementById('twitchFrame').src = `https://www.twitch.tv/embed/${twitchName}/chat?parent=${parent}`;
-            }
-        }
-    </script>
+    localStorage.setItem("ytId", ytId);
+
+    if (ytId) {
+        document.getElementById("yt").src =
+            `https://www.youtube.com/live_chat?v=${ytId}&embed_domain=${parent}`;
+    }
+
+    document.getElementById("tw").src =
+        `https://www.twitch.tv/embed/${TWITCH_CHANNEL}/chat?parent=${parent}`;
+}
+
+function toggleFS() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+}
+</script>
+
 </body>
 </html>
