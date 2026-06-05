@@ -7,111 +7,80 @@
 
 <style>
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #1a1a1a;
-    color: #fff;
     margin: 0;
-    padding: 12px;
+    background: #000;
+    font-family: sans-serif;
+    color: #fff;
 }
 
-/* 🔥 自動縮放字體（重點） */
-:root {
-    --font-sm: clamp(12px, 1.2vw, 16px);
-    --font-md: clamp(14px, 1.5vw, 20px);
-    --font-lg: clamp(16px, 2vw, 26px);
-}
-
-/* top bar */
+/* 控制列 */
 .top-bar {
     display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    align-items: center;
-}
-
-.toggle-btn {
-    padding: 10px 14px;
-    background: #555;
-    border: none;
-    color: #fff;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: var(--font-sm);
-}
-
-.settings {
-    background: #333;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 12px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    background: #111;
 }
 
 input {
     flex: 1;
-    min-width: 180px;
-    padding: 10px;
-    border-radius: 4px;
+    padding: 14px;
+    font-size: 18px;   /* 🔥 大字 */
     border: none;
-    font-size: var(--font-md);
+    border-radius: 10px;
 }
 
-button.load {
-    padding: 10px 16px;
-    cursor: pointer;
+button {
+    padding: 14px 16px;
+    font-size: 18px;   /* 🔥 大按鈕 */
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
     background: #9147ff;
     color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: var(--font-md);
 }
 
-/* chat */
-.chat-container {
+/* 主畫面 */
+.container {
     display: flex;
-    gap: 12px;
-    height: calc(100vh - 140px);
+    flex-direction: column;
+    height: calc(100vh - 70px);
 }
 
-.chat-box {
+.box {
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
-iframe {
-    width: 100%;
-    height: 100%;
-    border: 1px solid #444;
-    background: #000;
-    border-radius: 6px;
-}
-
-/* 🔥 標題自動縮放 */
+/* 標題更大 */
 h3 {
-    margin: 6px 0;
-    font-size: var(--font-md);
+    margin: 0;
+    padding: 10px;
+    font-size: 18px;
+    background: #111;
     color: #aaa;
 }
 
-/* 📱 手機 */
-@media (max-width: 768px) {
-    .chat-container {
-        flex-direction: column;
-        height: auto;
-    }
-
-    .chat-box {
-        height: 45vh;
-    }
+/* 聊天區更高 */
+iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
 }
 
-/* 隱藏 */
-.hidden {
-    display: none;
+/* 戶外手機最佳：避免太小 */
+@media (max-width: 768px) {
+    input {
+        font-size: 18px;
+    }
+
+    button {
+        font-size: 18px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
 }
 </style>
 </head>
@@ -119,59 +88,44 @@ h3 {
 <body>
 
 <div class="top-bar">
-    <button class="toggle-btn" onclick="toggleSettings()">⚙️ 設定</button>
-    <button class="load" onclick="saveAndLoad()">載入聊天室</button>
+    <input id="ytId" placeholder="YouTube 影片 ID">
+    <button onclick="load()">載入</button>
 </div>
 
-<div id="settings" class="settings hidden">
-    <input type="text" id="ytId" placeholder="YouTube 影片 ID">
-</div>
+<div class="container">
 
-<div class="chat-container">
-    <div class="chat-box">
-        <h3>YouTube 聊天室</h3>
-        <iframe id="ytFrame"></iframe>
+    <div class="box">
+        <h3>YouTube Chat</h3>
+        <iframe id="yt"></iframe>
     </div>
 
-    <div class="chat-box">
-        <h3>Twitch（jeff_jian_57）</h3>
-        <iframe id="twitchFrame"></iframe>
+    <div class="box">
+        <h3>Twitch (jeff_jian_57)</h3>
+        <iframe id="tw"></iframe>
     </div>
+
 </div>
 
 <script>
 const TWITCH_CHANNEL = "jeff_jian_57";
 
 window.onload = () => {
-    document.getElementById('ytId').value =
-        localStorage.getItem('ytId') || '';
-
-    loadChats();
+    document.getElementById("ytId").value =
+        localStorage.getItem("ytId") || "";
 };
 
-function toggleSettings() {
-    document.getElementById('settings')
-        .classList.toggle('hidden');
-}
-
-function saveAndLoad() {
-    localStorage.setItem(
-        'ytId',
-        document.getElementById('ytId').value
-    );
-    loadChats();
-}
-
-function loadChats() {
-    const ytId = document.getElementById('ytId').value;
+function load() {
+    const ytId = document.getElementById("ytId").value;
     const parent = window.location.hostname || "127.0.0.1";
 
+    localStorage.setItem("ytId", ytId);
+
     if (ytId) {
-        document.getElementById('ytFrame').src =
+        document.getElementById("yt").src =
             `https://www.youtube.com/live_chat?v=${ytId}&embed_domain=${parent}`;
     }
 
-    document.getElementById('twitchFrame').src =
+    document.getElementById("tw").src =
         `https://www.twitch.tv/embed/${TWITCH_CHANNEL}/chat?parent=${parent}`;
 }
 </script>
