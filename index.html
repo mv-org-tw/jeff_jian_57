@@ -1,172 +1,180 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>直播聊天室</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>直播聊天室</title>
 
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #1a1a1a;
-            color: #fff;
-            margin: 0;
-            padding: 12px;
-        }
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #1a1a1a;
+    color: #fff;
+    margin: 0;
+    padding: 12px;
+}
 
-        .top-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
+/* 🔥 自動縮放字體（重點） */
+:root {
+    --font-sm: clamp(12px, 1.2vw, 16px);
+    --font-md: clamp(14px, 1.5vw, 20px);
+    --font-lg: clamp(16px, 2vw, 26px);
+}
 
-        .toggle-btn {
-            padding: 10px 14px;
-            background: #555;
-            border: none;
-            color: #fff;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+/* top bar */
+.top-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
 
-        .settings {
-            background: #333;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+.toggle-btn {
+    padding: 10px 14px;
+    background: #555;
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: var(--font-sm);
+}
 
-        input {
-            flex: 1;
-            min-width: 180px;
-            padding: 10px;
-            border-radius: 4px;
-            border: none;
-        }
+.settings {
+    background: #333;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 
-        button.load {
-            padding: 10px 16px;
-            cursor: pointer;
-            background: #9147ff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-        }
+input {
+    flex: 1;
+    min-width: 180px;
+    padding: 10px;
+    border-radius: 4px;
+    border: none;
+    font-size: var(--font-md);
+}
 
-        .chat-container {
-            display: flex;
-            gap: 12px;
-            height: calc(100vh - 140px);
-        }
+button.load {
+    padding: 10px 16px;
+    cursor: pointer;
+    background: #9147ff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: var(--font-md);
+}
 
-        .chat-box {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
+/* chat */
+.chat-container {
+    display: flex;
+    gap: 12px;
+    height: calc(100vh - 140px);
+}
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: 1px solid #444;
-            background: #000;
-            border-radius: 6px;
-        }
+.chat-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
 
-        h3 {
-            margin: 6px 0;
-            font-size: 14px;
-            color: #aaa;
-        }
+iframe {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #444;
+    background: #000;
+    border-radius: 6px;
+}
 
-        /* 📱 手機 */
-        @media (max-width: 768px) {
-            .chat-container {
-                flex-direction: column;
-                height: auto;
-            }
+/* 🔥 標題自動縮放 */
+h3 {
+    margin: 6px 0;
+    font-size: var(--font-md);
+    color: #aaa;
+}
 
-            .chat-box {
-                height: 45vh;
-            }
-        }
+/* 📱 手機 */
+@media (max-width: 768px) {
+    .chat-container {
+        flex-direction: column;
+        height: auto;
+    }
 
-        /* 隱藏用 */
-        .hidden {
-            display: none;
-        }
-    </style>
+    .chat-box {
+        height: 45vh;
+    }
+}
+
+/* 隱藏 */
+.hidden {
+    display: none;
+}
+</style>
 </head>
 
 <body>
 
-    <div class="top-bar">
-        <button class="toggle-btn" onclick="toggleSettings()">
-            ⚙️ 設定
-        </button>
+<div class="top-bar">
+    <button class="toggle-btn" onclick="toggleSettings()">⚙️ 設定</button>
+    <button class="load" onclick="saveAndLoad()">載入聊天室</button>
+</div>
 
-        <button class="load" onclick="saveAndLoad()">
-            載入聊天室
-        </button>
+<div id="settings" class="settings hidden">
+    <input type="text" id="ytId" placeholder="YouTube 影片 ID">
+</div>
+
+<div class="chat-container">
+    <div class="chat-box">
+        <h3>YouTube 聊天室</h3>
+        <iframe id="ytFrame"></iframe>
     </div>
 
-    <div id="settings" class="settings hidden">
-        <input type="text" id="ytId" placeholder="YouTube 影片 ID">
+    <div class="chat-box">
+        <h3>Twitch（jeff_jian_57）</h3>
+        <iframe id="twitchFrame"></iframe>
     </div>
+</div>
 
-    <div class="chat-container">
-        <div class="chat-box">
-            <h3>YouTube 聊天室</h3>
-            <iframe id="ytFrame"></iframe>
-        </div>
+<script>
+const TWITCH_CHANNEL = "jeff_jian_57";
 
-        <div class="chat-box">
-            <h3>Twitch（jeff_jian_57）</h3>
-            <iframe id="twitchFrame"></iframe>
-        </div>
-    </div>
+window.onload = () => {
+    document.getElementById('ytId').value =
+        localStorage.getItem('ytId') || '';
 
-    <script>
-        const TWITCH_CHANNEL = "jeff_jian_57";
+    loadChats();
+};
 
-        window.onload = () => {
-            document.getElementById('ytId').value =
-                localStorage.getItem('ytId') || '';
+function toggleSettings() {
+    document.getElementById('settings')
+        .classList.toggle('hidden');
+}
 
-            loadChats();
-        };
+function saveAndLoad() {
+    localStorage.setItem(
+        'ytId',
+        document.getElementById('ytId').value
+    );
+    loadChats();
+}
 
-        function toggleSettings() {
-            const box = document.getElementById('settings');
-            box.classList.toggle('hidden');
-        }
+function loadChats() {
+    const ytId = document.getElementById('ytId').value;
+    const parent = window.location.hostname || "127.0.0.1";
 
-        function saveAndLoad() {
-            localStorage.setItem(
-                'ytId',
-                document.getElementById('ytId').value
-            );
-            loadChats();
-        }
+    if (ytId) {
+        document.getElementById('ytFrame').src =
+            `https://www.youtube.com/live_chat?v=${ytId}&embed_domain=${parent}`;
+    }
 
-        function loadChats() {
-            const ytId = document.getElementById('ytId').value;
-            const parent = window.location.hostname || "127.0.0.1";
-
-            if (ytId) {
-                document.getElementById('ytFrame').src =
-                    `https://www.youtube.com/live_chat?v=${ytId}&embed_domain=${parent}`;
-            }
-
-            document.getElementById('twitchFrame').src =
-                `https://www.twitch.tv/embed/${TWITCH_CHANNEL}/chat?parent=${parent}`;
-        }
-    </script>
+    document.getElementById('twitchFrame').src =
+        `https://www.twitch.tv/embed/${TWITCH_CHANNEL}/chat?parent=${parent}`;
+}
+</script>
 
 </body>
 </html>
